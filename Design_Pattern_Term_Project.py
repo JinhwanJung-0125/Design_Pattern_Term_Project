@@ -63,26 +63,26 @@ class MemoryAccess(Access): #Concrete Implementor
             print("Wrong Memory Access!")
             exit(1)
 
-        if size == 0:
-            if readOrWrite == 0:
+        if size == 0:   #1byte
+            if readOrWrite == 0:    #read
                 value = pM[offset]
                 return value
-            elif readOrWrite == 1:
+            elif readOrWrite == 1:  #write
                 pM[offset] = value & 0xff
                 return value
-        elif size == 1:
-            if readOrWrite == 0:
+        elif size == 1: #half word
+            if readOrWrite == 0:    #read
                 value = (pM[offset]) | (pM[offset + 1] << 8)
                 return value
-            elif readOrWrite == 1:
+            elif readOrWrite == 1:  #write
                 pM[offset] = value & 0x00ff
                 pM[offset + 1] = (value & 0xff00) >> 8
                 return value
-        elif size == 2:
-            if readOrWrite == 0:
-                value = pM[offset] | (pM[offset + 1] << 8) | (pM[offset + 2] << 16)
+        elif size == 2: #word
+            if readOrWrite == 0:    #read
+                value = pM[offset] | (pM[offset + 1] << 8) | (pM[offset + 2] << 16) | (pM[offset + 3] << 24)
                 return value
-            elif readOrWrite == 1:
+            elif readOrWrite == 1:  #write
                 pM[offset] = value & 0x000000ff
                 pM[offset + 1] = (value & 0x0000ff00) >> 8
                 pM[offset + 2] = (value & 0x00ff0000) >> 16
@@ -189,23 +189,24 @@ class ALU:
 
     @staticmethod
     def ALU(inst, PC, MEM: MemoryRegister, Reg: MemoryRegister):
-        IR = InstructionRegister(ALU.invert_endian(inst)) #big => little 변경
+        IR = InstructionRegister(inst)
+        print("IR ", bin(IR.I))
         PC = Reg.useToAccess(32, 0, 0)
 
         if IR.RI.opcode == 0:
             if IR.RI.funct == 0:
-                Reg.useToAccess(IR.RI.rd, Reg.useToAccess(IR.RI.rt, 0, 0) << IR.RI.sh, 1)
+                Reg.useToAccess(IR.RI.rd, Reg.useToAccess(IR.RI.rt, 0, 0) << IR.RI.shamt, 1)
                 Reg.useToAccess(32, PC + 4, 1)
 
             elif IR.RI.funct == 2:  # srl
-                Reg.useToAccess(IR.RI.rd, Reg.useToAccess(IR.RI.rt, 0, 0) >> IR.RI.sh, 1)
+                Reg.useToAccess(IR.RI.rd, Reg.useToAccess(IR.RI.rt, 0, 0) >> IR.RI.shamt, 1)
                 Reg.useToAccess(32, PC + 4, 1)
 
             elif IR.RI.funct == 3:  # sra
                 MSB = Reg.useToAccess(IR.RI.rt, 0, 0) & 0x80000000
                 temp = Reg.useToAccess(IR.RI.rt, 0, 0)
 
-                for _ in range(IR.RI.sh):
+                for _ in range(IR.RI.shamt):
                     temp = (temp >> 1) + MSB
 
                 Reg.useToAccess(IR.RI.rt, temp, 1)
@@ -275,6 +276,93 @@ class ALU:
 
             else:  # default
                 Reg.useToAccess(32, PC + 4, 1)
+        else:
+            if IR.RI.opcode == 1:   #bltz rs, L : branch less then 0
+                L = PC + ((IR.I & 0x0000ffff) << 2)
+                if Reg.useToAccess(IR.RI.rs, 0, 0) < 0:
+                    Reg.useToAccess(32, L, 1)
+                else:
+                    Reg.useToAccess(32, PC + 4, 1)
+
+            elif IR.RI.opcode == 2: #j L : jump -> address00 + 4 : Program Counter
+                L = (PC >> 28) | ((IR.I & 0x03ffffff) << 2)
+                Reg.useToAccess(32, L , 1)
+
+            elif IR.RI.opcode == 3: #jal L : jump and link
+                L=(PC>>28)|((IR.I & 0x0000ffff) <<2);
+                Reg.useToAccess(31, PC+4, 1);
+                Reg.useToAccess(32, L, 1); #다음 주소값 명령어를 레지스터에 저장
+
+            elif IR.RI.opcode == 4: #beq rs, rt, L : branch equal
+                L = PC + ((IR.I & 0x0000ffff) << 2)
+                if Reg.useToAccess(IR.RI.rs, 0, 0) == Reg.useToAccess(IR.RI.rt, 0, 0):
+                    Reg.useToAccess(32, L, 1)
+                else:
+                    Reg.useToAccess(32, PC + 4, 1)
+
+            elif IR.RI.opcode == 5: #bne rs, rt, L: Branch not equal
+                L = PC + ((IR.I & 0x0000ffff) << 2)
+                if Reg.useToAccess(IR.RI.rs, 0, 0) != Reg.useToAccess(IR.RI.rt, 0, 0):
+                    Reg.useToAccess(32, L, 1)
+                else:
+                    Reg.useToAccess(32, PC + 4, 1)
+
+            elif IR.RI.opcode == 8: #addi rt,rs, imm: ADD immediate
+                result = Reg.useToAccess(IR.RI.rs, 0, 0) + (IR.I & 0x0000ffff)
+                Reg.useToAccess(IR.RI.rt, result, 1)
+                Reg.useToAccess(32, PC + 4, 1)
+
+            elif IR.RI.opcode == 10:    #slti rt,rs, imm: set less than immediate
+                if(Reg.useToAccess(IR.RI.rs,0,0) < (IR.I & 0x0000ffff)):
+                    Reg.useToAccess(IR.RI.rt, 1, 1);#$s1=1
+                else:
+                    Reg.useToAccess(IR.RI.rt, 0, 1);#$s1=0
+                Reg.useToAccess(32, PC+4, 1);
+
+            elif IR.RI.opcode == 12:    #andi rt, rs, imm: AND immediate
+                result = Reg.useToAccess(IR.RI.rs, 0, 0) & (IR.I & 0x0000ffff)
+                Reg.useToAccess(IR.RI.rt, result, 1)
+                Reg.useToAccess(32, PC + 4, 1)
+
+            elif IR.RI.opcode == 13:    #ori rt, rs, imm: OR immediate
+                result = Reg.useToAccess(IR.RI.rs, 0, 0) | (IR.I & 0x0000ffff)
+                Reg.useToAccess(IR.RI.rt, result, 1)
+                Reg.useToAccess(32, PC + 4, 1)
+
+            elif IR.RI.opcode == 14:    #xor rt, rs, imm: XOR immediate
+                result = Reg.useToAccess(IR.RI.rs, 0, 0) ^ (IR.I & 0x0000ffff)
+                Reg.useToAccess(IR.RI.rt, result, 1)
+                Reg.useToAccess(32, PC + 4, 1)
+
+            elif IR.RI.opcode == 15:    #lui rt, imm: load upper immediate// 상위 16bit에 imm값 넣고 뒤 16bit는 0으로 둔다.
+                immUp = (IR.I & 0x0000ffff) << 16
+                Reg.useToAccess(IR.RI.rt, immUp, 1)
+                Reg.useToAccess(32, PC + 4, 1)
+
+            elif IR.RI.opcode == 32:    #lb rt, imm(rs): load byte
+                MEMout = MEM.useToAccess(Reg.useToAccess(IR.RI.rs,0,0) + (IR.I & 0x0000ffff), 0, 0, 0)
+                if(((MEMout & 0xa0) >> 7) == 1): MEMout = MEMout | 0xffffff00
+                Reg.useToAccess(IR.RI.rt, MEMout, 1)
+                Reg.useToAccess(32, PC+4, 1)
+
+            elif IR.RI.opcode == 35:    #lw rt, imm(rs): load word
+                Reg.useToAccess(IR.RI.rt, MEM.useToAccess(Reg.useToAccess(IR.RI.rs,0,0) + (IR.I & 0x0000ffff), 0, 0, 2), 1)
+                Reg.useToAccess(32, PC+4, 1)
+
+            elif IR.RI.opcode == 36:    #lbu rt, imm(rs): load byte unsigned
+                Reg.useToAccess(IR.RI.rt, MEM.useToAccess(Reg.useToAccess(IR.RI.rs,0,0) + (IR.I & 0x0000ffff), 0, 0, 0), 1)
+                Reg.useToAccess(32, PC+4, 1)
+
+            elif IR.RI.opcode == 40:    #sb rt, imm(rs): store byte/ reg->mem
+                MEM.useToAccess(Reg.useToAccess(IR.RI.rs,0,0) + (IR.I & 0x0000ffff), Reg.useToAccess(IR.RI.rt, 0, 0), 1, 0)
+                Reg.useToAccess(32, PC+4, 1)
+
+            elif IR.RI.opcode == 43:    #sw rt, im(rs): store word
+                MEM.useToAccess(Reg.useToAccess(IR.RI.rs,0,0) + (IR.I & 0x0000ffff), Reg.useToAccess(IR.RI.rt, 0, 0), 1, 2)
+                Reg.useToAccess(32, PC+4, 1)
+
+            else:
+                Reg.useToAccess(32, PC+4, 1)
 
         return 1
 
@@ -361,7 +449,7 @@ class loadProgram(Command):
         for i in range(dataNum):
             buff = int.from_bytes(self.fileReader.read(4), byteorder = "big")
 
-            self.MEM.useToAccess(0x10000000 + (i * 4), buff, i ,2)
+            self.MEM.useToAccess(0x10000000 + (i * 4), buff, 1 ,2)
 
         isExecutable = True
         print("Program load success\n")
@@ -401,10 +489,7 @@ class step(Command):
     def execute(self):
         global isEnd, isExecutable
         PC = self.Reg.useToAccess(32, 0, 0)
-        print(PC)
         inst = self.MEM.useToAccess(PC, 0, 0, 2)
-
-        print(inst)
 
         if ALU.ALU(inst, PC, self.MEM, self.Reg) == 0:
             isEnd = True
@@ -454,12 +539,18 @@ class Facade:
             command = input().split()
 
             if command[0] == 'l':
-                openedFile = open(command[1], 'rb')
-                self.interface.addCommand(loadProgram(self.MEM, self.Reg, openedFile))
-                self.interface.runCommand()
+                if len(command) != 2:
+                    print("Error: Wrong command format!\n")
+                else:
+                    openedFile = open(command[1], 'rb')
+                    self.interface.addCommand(loadProgram(self.MEM, self.Reg, openedFile))
+                    self.interface.runCommand()
             elif command[0] == "j" and isExecutable == True:
-                self.interface.addCommand(jumpProgram(int(command[1]), self.Reg))
-                self.interface.runCommand()
+                if len(command) != 2:
+                    print("Error: Wrong command format!\n")
+                else:
+                    self.interface.addCommand(jumpProgram(int(command[1]), self.Reg))
+                    self.interface.runCommand()
             elif command[0] == "g" and isExecutable == True:
                 self.interface.addCommand(goProgram(step(self.MEM, self.Reg)))
                 self.interface.runCommand()
@@ -467,19 +558,27 @@ class Facade:
                 self.interface.addCommand(step(self.MEM, self.Reg))
                 self.interface.runCommand()
             elif command[0] == "m" and isExecutable == True:
-                print(command)
-                self.MEM.useToPrint(int(command[1], 0), int(command[2], 0))
+                if len(command) != 3:
+                    print("Error: Wrong command format!\n")
+                else:
+                    self.MEM.useToPrint(int(command[1], 0), int(command[2], 0))
             elif command[0] == "r" and isExecutable == True:
                 self.Reg.useToPrint()
             elif command[0] == 'x':
                 print("-----Simulator End-----\n")
                 return 0
             elif command[0] == 'sr' and isExecutable == True:
-                self.interface.addCommand(setRegister(int(command[1]), int(command[2]), self.Reg))
-                self.interface.runCommand()
+                if len(command) != 3:
+                    print("Error: Wrong command format!\n")
+                else:
+                    self.interface.addCommand(setRegister(int(command[1]), int(command[2]), self.Reg))
+                    self.interface.runCommand()
             elif command[0] == 'sm' and isExecutable == True:
-                self.interface.addCommand(setMemory(int(command[1], 0), int(command[2]), self.MEM))
-                self.interface.runCommand()
+                if len(command) != 3:
+                    print("Error: Wrong command format!\n")
+                else:
+                    self.interface.addCommand(setMemory(int(command[1], 0), int(command[2]), self.MEM))
+                    self.interface.runCommand()
             else:
                 if isExecutable == False:
                     if isEnd == True:
