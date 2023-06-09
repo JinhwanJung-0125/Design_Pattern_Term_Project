@@ -324,9 +324,9 @@ class ALU:
                 Reg.useToAccess(32, L , 1)
 
             elif IR.RI.opcode == 3: #jal L : jump and link
-                print("jal 0x%x" %(IR.I & 0x0000ffff))
-                L=(PC>>28)|((IR.I & 0x0000ffff) <<2)
-                Reg.useToAccess(31, PC+4, 1)
+                print("jal 0x%x" %(IR.I & 0x03ffffff))
+                L = (PC >> 28) | ((IR.I & 0x03ffffff) << 2)
+                Reg.useToAccess(31, PC + 4, 1)
                 Reg.useToAccess(32, L, 1) #다음 주소값 명령어를 레지스터에 저장
 
             elif IR.RI.opcode == 4: #beq rs, rt, L : branch equal
