@@ -4,7 +4,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>4d96197e-c799-455f-bbbf-a967f018e43c</ProjectGuid>
     <ProjectHome>.</ProjectHome>
-    <StartupFile>Design_Pattern_Term_Project.py</StartupFile>
+    <StartupFile>Main.py</StartupFile>
     <SearchPath>
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
@@ -22,6 +22,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Design_Pattern_Term_Project.py" />
+    <Compile Include="Main.py" />
+    <Compile Include="Modules\ALU.py" />
+    <Compile Include="Modules\Commands.py" />
+    <Compile Include="Modules\Memory_Register.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Modules\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in
