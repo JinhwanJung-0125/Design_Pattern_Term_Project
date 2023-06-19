@@ -1,4 +1,4 @@
-#Memory¿Í Register Á¢±Ù ±¸Çö¿¡ Bridge PatternÀ» Àû¿ë
+#Memoryï¿½ï¿½ Register ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Bridge Patternï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 from asyncio.windows_events import NULL
 from io import BufferedReader
@@ -56,13 +56,13 @@ class MemoryAccess(Access): #Concrete Implementor
         selectMEM = addr >> 20
         offset = addr & 0xfffff
 
-        if selectMEM == 0x004:      #Text ¿µ¿ª Memory
+        if selectMEM == 0x004:      #Text ï¿½ï¿½ï¿½ï¿½ Memory
             pM = self.progMEM
 
-        elif selectMEM == 0x100:    #Data ¿µ¿ª Memory
+        elif selectMEM == 0x100:    #Data ï¿½ï¿½ï¿½ï¿½ Memory
             pM = self.dataMEM
 
-        elif selectMEM == 0x7ff:    #Stack ¿µ¿ª Memory
+        elif selectMEM == 0x7ff:    #Stack ï¿½ï¿½ï¿½ï¿½ Memory
             pM = self.stackMEM
 
         else:
@@ -104,7 +104,7 @@ class MemoryAccess(Access): #Concrete Implementor
             exit(1)
 
     def printing(self, start, end):
-        front = start >> 20  # ¾Õ 12ºñÆ®
+        front = start >> 20  # ï¿½ï¿½ 12ï¿½ï¿½Æ®
         offset = start & 0xFFFFF
         e_offset = end & 0xFFFFF
 
@@ -143,7 +143,7 @@ class MemoryRegister: #Abstraction
         pass
 
 class Register(MemoryRegister): #Concrete Abstraction   (Register)
-    def useToAccess(self, addr, value, readOrWrite):                #addr = Register ¹øÈ£ / value = Register¿¡ ¾²°íÀÚ ÇÏ´Â °ª / readOrWrite = 0: Register ÀÐ±â , 1: Register ¾²±â 
+    def useToAccess(self, addr, value, readOrWrite):                #addr = Register ï¿½ï¿½È£ / value = Registerï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½ï¿½ / readOrWrite = 0: Register ï¿½Ð±ï¿½ , 1: Register ï¿½ï¿½ï¿½ï¿½ 
         return self.access.access(addr, value, readOrWrite)
 
     def useToPrint(self):
@@ -153,10 +153,10 @@ class Register(MemoryRegister): #Concrete Abstraction   (Register)
         self.access.initReg()
 
 class Memory(MemoryRegister):   #Concrete Abstraction   (Memory)
-    def useToAccess(self, addr, value, readOrWrite, size):          #addr = Memory ÁÖ¼Ò / value = Memory¿¡ ¾²°íÀÚ ÇÏ´Â °ª / readOrWrite = 0: Memory ÀÐ±â , 1: Memory ¾²±â / size = Memory¿¡ ÇÑ¹ø¿¡ AccessÇÒ Å©±â 0: 1byte , 1: half word , 2: word
+    def useToAccess(self, addr, value, readOrWrite, size):          #addr = Memory ï¿½Ö¼ï¿½ / value = Memoryï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½ï¿½ / readOrWrite = 0: Memory ï¿½Ð±ï¿½ , 1: Memory ï¿½ï¿½ï¿½ï¿½ / size = Memoryï¿½ï¿½ ï¿½Ñ¹ï¿½ï¿½ï¿½ Accessï¿½ï¿½ Å©ï¿½ï¿½ 0: 1byte , 1: half word , 2: word
         return self.access.access(addr, value, readOrWrite, size)
 
-    def useToPrint(self, start, end):       #start: Memory Print ½ÃÀÛ ÁöÁ¡ / end: Memory Print ³¡ ÁöÁ¡
+    def useToPrint(self, start, end):       #start: Memory Print ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ / end: Memory Print ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         self.access.printing(start, end)
 
 
@@ -165,12 +165,12 @@ class Memory(MemoryRegister):   #Concrete Abstraction   (Memory)
 
 #InstructionRegister
 
-class InstructionRegister:              #¸í·É¾î Æ÷¸ä Data Structure
+class InstructionRegister:              #ï¿½ï¿½É¾ï¿½ ï¿½ï¿½ï¿½ï¿½ Data Structure
     def __init__(self, num):
-        self.I = num  #32-bits ¼ýÀÚ
-        self.RI = self.RFormat(num)    #32-bits R formatÇü½Ä ¸í·É¾î
-        self.II = self.IFormat(num)    #32-bits I formatÇü½Ä ¸í·É¾î
-        self.JI = self.JFormat(num)    #32-bits J formatÇü½Ä ¸í·É¾î
+        self.I = num  #32-bits ï¿½ï¿½ï¿½ï¿½
+        self.RI = self.RFormat(num)    #32-bits R formatï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½É¾ï¿½
+        self.II = self.IFormat(num)    #32-bits I formatï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½É¾ï¿½
+        self.JI = self.JFormat(num)    #32-bits J formatï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½É¾ï¿½
 
     class RFormat:
         def __init__(self, I):
@@ -197,7 +197,7 @@ class InstructionRegister:              #¸í·É¾î Æ÷¸ä Data Structure
 
 class ALU:
     @staticmethod
-    def invert_endian(inVal):   #Endian º¯È¯ ÇÔ¼ö
+    def invert_endian(inVal):   #Endian ï¿½ï¿½È¯ ï¿½Ô¼ï¿½
         inVal = ((inVal >> 24) & 0xff) | ((inVal << 8) & 0xff0000) | ((inVal >> 8) & 0xff00) | ((inVal << 24) & 0xff000000)
         return inVal
 
@@ -252,8 +252,8 @@ class ALU:
             elif IR.RI.funct == 24:  # MULT: multiply rs, rt
                 print("mul $" + str(IR.RI.rs) + " $" + str(IR.RI.rt))
                 multiResult = Reg.useToAccess(IR.RI.rs, 0, 0) * Reg.useToAccess(IR.RI.rt, 0, 0)
-                hi = multiResult >> 32  # »óÀ§ 32ºñÆ®
-                lo = multiResult & 0xffffffff  # ÇÏÀ§ 32ºñÆ®
+                hi = multiResult >> 32  # ï¿½ï¿½ï¿½ï¿½ 32ï¿½ï¿½Æ®
+                lo = multiResult & 0xffffffff  # ï¿½ï¿½ï¿½ï¿½ 32ï¿½ï¿½Æ®
                 Reg.useToAccess(33, hi, 1)
                 Reg.useToAccess(34, lo, 1)
                 Reg.useToAccess(32, PC + 4, 1)
@@ -327,7 +327,7 @@ class ALU:
                 print("jal 0x%x" %(IR.I & 0x03ffffff))
                 L = (PC >> 28) | ((IR.I & 0x03ffffff) << 2)
                 Reg.useToAccess(31, PC + 4, 1)
-                Reg.useToAccess(32, L, 1) #´ÙÀ½ ÁÖ¼Ò°ª ¸í·É¾î¸¦ ·¹Áö½ºÅÍ¿¡ ÀúÀå
+                Reg.useToAccess(32, L, 1) #ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¼Ò°ï¿½ ï¿½ï¿½É¾î¸¦ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ ï¿½ï¿½ï¿½ï¿½
 
             elif IR.RI.opcode == 4: #beq rs, rt, L : branch equal
                 print("beq $" + str(IR.RI.rs) + " $" + str(IR.RI.rt) + " 0x%x" %(IR.I & 0x0000ffff))
@@ -377,7 +377,7 @@ class ALU:
                 Reg.useToAccess(IR.RI.rt, result, 1)
                 Reg.useToAccess(32, PC + 4, 1)
 
-            elif IR.RI.opcode == 15:    #lui rt, imm: load upper immediate// »óÀ§ 16bit¿¡ imm°ª ³Ö°í µÚ 16bit´Â 0À¸·Î µÐ´Ù.
+            elif IR.RI.opcode == 15:    #lui rt, imm: load upper immediate// ï¿½ï¿½ï¿½ï¿½ 16bitï¿½ï¿½ immï¿½ï¿½ ï¿½Ö°ï¿½ ï¿½ï¿½ 16bitï¿½ï¿½ 0ï¿½ï¿½ï¿½ï¿½ ï¿½Ð´ï¿½.
                 print("lui $" + str(IR.RI.rt) + " 0x%x" %(IR.I & 0x0000ffff))
                 immUp = (IR.I & 0x0000ffff) << 16
                 Reg.useToAccess(IR.RI.rt, immUp, 1)
@@ -423,7 +423,7 @@ class ALU:
 isEnd = False
 isExecutable = False
 
-#interface´Â Command PatternÀ» Àû¿ë
+#interfaceï¿½ï¿½ Command Patternï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 class Command:  #Command(API)
     def execute(self):
@@ -441,7 +441,7 @@ class interface:    #Invoker
 
 
 
-class setPC(Command):           #Program Counter ¼¼ÆÃ
+class setPC(Command):           #Program Counter ï¿½ï¿½ï¿½ï¿½
     def __init__(self, addr, Reg: MemoryRegister):
         self.PC = 32
         self.addr = addr
@@ -450,7 +450,7 @@ class setPC(Command):           #Program Counter ¼¼ÆÃ
     def execute(self):
         self.Reg.useToAccess(self.PC, self.addr, 1)
 
-class setSP(Command):           #Stack Pointer ¼¼ÆÃ
+class setSP(Command):           #Stack Pointer ï¿½ï¿½ï¿½ï¿½
     def __init__(self, addr, Reg: MemoryRegister):
         self.addr = addr
         self.Reg = Reg
@@ -458,7 +458,7 @@ class setSP(Command):           #Stack Pointer ¼¼ÆÃ
     def execute(self):
         self.Reg.useToAccess(29, self.addr, 1)
 
-class loadProgram(Command):     #ÇÁ·Î±×·¥ ·Îµå
+class loadProgram(Command):     #ï¿½ï¿½ï¿½Î±×·ï¿½ ï¿½Îµï¿½
     def __init__(self, MEM: MemoryRegister, Reg: MemoryRegister, fileReader: BufferedReader):
         self.MEM = MEM
         self.Reg = Reg
@@ -506,7 +506,7 @@ class loadProgram(Command):     #ÇÁ·Î±×·¥ ·Îµå
         isExecutable = True
         print("Program load success\n")
 
-class jumpProgram(Command):     #Æ¯Á¤ À§Ä¡·Î Jump
+class jumpProgram(Command):     #Æ¯ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Jump
     def __init__(self, startPosition, Reg: MemoryRegister):
         self.Reg = Reg
         self.startPosition = startPosition
@@ -521,7 +521,7 @@ class jumpProgram(Command):     #Æ¯Á¤ À§Ä¡·Î Jump
         else:
             print("Error: Wrong Access!\n")
 
-class goProgram(Command):   #ÇÁ·Î±×·¥ ÀüÃ¼ ½ÇÇà
+class goProgram(Command):   #ï¿½ï¿½ï¿½Î±×·ï¿½ ï¿½ï¿½Ã¼ ï¿½ï¿½ï¿½ï¿½
     def __init__(self, command: Command):
         self.step = command
 
@@ -533,7 +533,7 @@ class goProgram(Command):   #ÇÁ·Î±×·¥ ÀüÃ¼ ½ÇÇà
 
         print("-----Program End-----\n\n")
 
-class step(Command):        #ÇÁ·Î±×·¥ ´Ü°èº° ½ÇÇà
+class step(Command):        #ï¿½ï¿½ï¿½Î±×·ï¿½ ï¿½Ü°èº° ï¿½ï¿½ï¿½ï¿½
     def __init__(self, MEM: MemoryRegister, Reg: MemoryRegister):
         self.Reg = Reg
         self.MEM = MEM
@@ -550,7 +550,7 @@ class step(Command):        #ÇÁ·Î±×·¥ ´Ü°èº° ½ÇÇà
 
         self.Reg.useToPrint()
 
-class setRegister(Command): #Æ¯Á¤ Register °ª ¼¼ÆÃ
+class setRegister(Command): #Æ¯ï¿½ï¿½ Register ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     def __init__(self, regNum, value, Reg: MemoryRegister):
         self.regNum = regNum
         self.value = value
@@ -560,7 +560,7 @@ class setRegister(Command): #Æ¯Á¤ Register °ª ¼¼ÆÃ
         self.Reg.useToAccess(self.regNum, self.value, 1)
         print("%d %d" % (self.regNum, self.value))
 
-class setMemory(Command):   #Æ¯Á¤ MemoryÀ§Ä¡ÀÇ °ª ¼¼ÆÃ
+class setMemory(Command):   #Æ¯ï¿½ï¿½ Memoryï¿½ï¿½Ä¡ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     def __init__(self, location, value, MEM: MemoryRegister):
         self.location = location
         self.value = value
@@ -572,7 +572,7 @@ class setMemory(Command):   #Æ¯Á¤ MemoryÀ§Ä¡ÀÇ °ª ¼¼ÆÃ
 
 
 
-#Á¾ÇÕÀûÀ¸·Î Facade PatternÀ» Àû¿ëÇÑ´Ù.
+#ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Facade Patternï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ñ´ï¿½.
 
 class Facade:
     def __init__(self):
@@ -649,14 +649,14 @@ class Facade:
                     self.interface.runCommand()
 
             else:
-                if isExecutable == False:                       #·ÎµåÇÑ ÇÁ·Î±×·¥ÀÌ ½ÇÇà ºÒ´É »óÅÂÀÏ ¶§
-                    if isEnd == True:                           #ÇÁ·Î±×·¥ ½ÇÇàÀÌ Á¾·áµÈ °æ¿ì
+                if isExecutable == False:                       #ï¿½Îµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î±×·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ò´ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+                    if isEnd == True:                           #ï¿½ï¿½ï¿½Î±×·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                         print("-----Program End-----\n")
 
-                    else:                                       #¿¹±âÄ¡ ¸øÇÑ ¹®Á¦·Î ÇÁ·Î±×·¥ÀÌ ½ÇÇà ºÒ°¡´ÉÇÑ °æ¿ì
+                    else:                                       #ï¿½ï¿½ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î±×·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ò°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
                         print("Error: Program is unexecutable!\n")
 
-                else:                                           #½Ã¹Ä·¹ÀÌÅÍ¿¡¼­ Áö¿øÇÏÁö ¾Ê´Â ¸í·É¾î
+                else:                                           #ï¿½Ã¹Ä·ï¿½ï¿½ï¿½ï¿½Í¿ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê´ï¿½ ï¿½ï¿½É¾ï¿½
                     print("Error: Unsupported Command!\n")
 
         return 0

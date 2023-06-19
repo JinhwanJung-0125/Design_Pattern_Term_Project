@@ -1,4 +1,6 @@
-﻿class Access:   #Implementor(API)
+﻿#Memory와 Register 구현은 Bridge Pattern을 적용
+
+class Access:   #Implementor(API)
     def access(self):
         pass
 
