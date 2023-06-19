@@ -163,7 +163,7 @@ class Facade:
         global isEnd, isExecutable
 
         print("-----Simulator Start-----\n")
-        print("Supported Command: l/j/g/s/m/r/x/sr/sm\n")
+        print("Support Command: l/j/g/s/m/r/x/sr/sm\n")
 
         while(True):
             print("Enter Command: ")
