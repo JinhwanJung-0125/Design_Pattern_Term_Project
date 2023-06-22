@@ -1,5 +1,5 @@
 # Design_Pattern_Term_Project
-Main.exe 실행<br>
+dist/Main/Main.exe 실행<br>
 시뮬레이터 명령어
 1. l XXXX.bin => Load Program 프로그램 로드<br>
    ex) l as_ex01_arith.bin
