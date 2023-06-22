@@ -16,7 +16,7 @@ class RegisterAccess(Access):   #Concrete Implementor
             return self.reg[addr]
 
         elif readOrWrite == 1:
-            self.reg[addr] = value
+            self.reg[addr] = value & 0xffffffff
             return value
 
         else:
@@ -76,24 +76,24 @@ class MemoryAccess(Access): #Concrete Implementor
 
         elif size == 1: #half word
             if readOrWrite == 0:    #read
-                value = (pM[offset]) | (pM[offset + 1] << 8)
+                value = (pM[offset] << 8) | pM[offset + 1]
                 return value
 
             elif readOrWrite == 1:  #write
-                pM[offset] = value & 0x00ff
-                pM[offset + 1] = (value & 0xff00) >> 8
+                pM[offset] = (value & 0xff00) >> 8
+                pM[offset + 1] = value & 0x00ff
                 return value
 
         elif size == 2: #word
             if readOrWrite == 0:    #read
-                value = pM[offset] | (pM[offset + 1] << 8) | (pM[offset + 2] << 16) | (pM[offset + 3] << 24)
+                value = (pM[offset] << 24) | (pM[offset + 1] << 16) | (pM[offset + 2] << 8) | pM[offset + 3] 
                 return value
 
             elif readOrWrite == 1:  #write
-                pM[offset] = value & 0x000000ff
-                pM[offset + 1] = (value & 0x0000ff00) >> 8
-                pM[offset + 2] = (value & 0x00ff0000) >> 16
-                pM[offset + 3] = (value & 0xff000000) >> 24
+                pM[offset] = (value & 0xff000000) >> 24
+                pM[offset + 1] = (value & 0x00ff0000) >> 16
+                pM[offset + 2] = (value & 0x0000ff00) >> 8
+                pM[offset + 3] = value & 0x000000ff
                 return value
         else:
             print("Wrong Memory Access Size!")
@@ -120,11 +120,20 @@ class MemoryAccess(Access): #Concrete Implementor
             print("No Such Memory")
             return 1
 
-        for i in range(offset, e_offset + 4):
-            if (i % 4) == 0 or i == offset:
-                print("\n[0x%X] " % ((front << 20) + i), end="")
 
-            print("%02x" % pM[i], end="")
+        if front == 0x7FF:
+            for i in range(offset, e_offset + 4, -1):
+                if (i % 4) == 0 or i == offset:
+                    print("\n[0x%X] " % ((front << 20) + i), end="")
+
+                print("%02x" % pM[i], end="")
+
+        else:
+            for i in range(offset, e_offset + 4):
+                if (i % 4) == 0 or i == offset:
+                    print("\n[0x%X] " % ((front << 20) + i), end="")
+
+                print("%02x" % pM[i], end="")
 
         print()
 
